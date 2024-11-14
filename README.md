@@ -1,5 +1,5 @@
-                                                                    # gnome-screenlock 
-Simple utility to control gnome screensaver via DBus using HTTP requests.
+# gnome-screenlock 
+Simple tool to control gnome screensaver via DBus using HTTP requests.
 May be useful for example to manage remote kiosk displays.
 
 ## Build

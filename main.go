@@ -40,6 +40,7 @@ func getScreenSaverStatus() (bool, error) {
 	return active, nil
 }
 
+// Function to set screen saver state
 func setScreenSaverActive(active bool) error {
 	// Connect to the session bus
 	conn, err := dbus.SessionBus()
@@ -58,6 +59,7 @@ func setScreenSaverActive(active bool) error {
 	return nil
 }
 
+// Handler for /on
 func onHandler(res http.ResponseWriter, _ *http.Request) {
 	// Set the screen saver active (true)
 	if err := setScreenSaverActive(true); err != nil {
@@ -75,6 +77,7 @@ func onHandler(res http.ResponseWriter, _ *http.Request) {
 	}
 }
 
+// Handler for /off
 func offHandler(res http.ResponseWriter, _ *http.Request) {
 	// Set the screen saver inactive (false)
 	if err := setScreenSaverActive(false); err != nil {
@@ -92,6 +95,7 @@ func offHandler(res http.ResponseWriter, _ *http.Request) {
 	}
 }
 
+// Handler for /status
 func statusHandler(res http.ResponseWriter, _ *http.Request) {
 	//Get the screen saver status
 	if active, err := getScreenSaverStatus(); err != nil {
