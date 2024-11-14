@@ -8,6 +8,8 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
+const serverAddr = `:57650`
+
 func setScreenSaverActive(active bool) error {
 	// Connect to the session bus
 	conn, err := dbus.SessionBus()
@@ -65,14 +67,14 @@ func offHandler(res http.ResponseWriter, _ *http.Request) {
 }
 
 func main() {
+	fmt.Printf("Running at %v\n", serverAddr)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc(`/on`, onHandler)
 	mux.HandleFunc(`/off`, offHandler)
 
-	serverAddr := `:57650`
 	err := http.ListenAndServe(serverAddr, mux)
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("listening %v", serverAddr)
 }
