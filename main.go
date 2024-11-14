@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/godbus/dbus/v5"
 	"log"
+	"net/http"
+
+	"github.com/godbus/dbus/v5"
 )
 
-func lockScreen() error {
+func setScreenSaverActive(active bool) error {
 	// Connect to the session bus
 	conn, err := dbus.SessionBus()
 	if err != nil {
@@ -17,21 +19,58 @@ func lockScreen() error {
 	objectPath := "/org/gnome/ScreenSaver"
 	interfaceName := "org.gnome.ScreenSaver"
 
-	// Create a new method call to Lock
-	call := conn.Object(interfaceName, dbus.ObjectPath(objectPath)).Call(interfaceName+".Lock", 0)
+	// Create a new method call to SetActive
+	call := conn.Object(interfaceName, dbus.ObjectPath(objectPath)).Call(interfaceName+".SetActive", 0, active)
 
 	// Check for errors in the method call
 	if call.Err != nil {
-		return fmt.Errorf("failed to call Lock method: %v", call.Err)
+		return fmt.Errorf("failed to call SetActive method: %v", call.Err)
 	}
 
 	return nil
 }
 
-func main() {
-	if err := lockScreen(); err != nil {
-		log.Fatalf("Error locking screen: %v", err)
+func onHandler(res http.ResponseWriter, _ *http.Request) {
+	// Set the screen saver active (true)
+	if err := setScreenSaverActive(true); err != nil {
+		http.Error(res, "Error setting screen saver active", http.StatusInternalServerError)
+		log.Printf("Error setting screen saver active: %v", err)
 	} else {
-		fmt.Println("Screen locked successfully.")
+		res.Header().Set("content-type", "text/plain; charset=UTF-8")
+		res.WriteHeader(http.StatusOK)
+		fmt.Println("Screen saver activated successfully.")
+		_, err := res.Write([]byte("Screen saver activated successfully."))
+		if err != nil {
+			log.Printf("failed to write response: %v", err)
+			return
+		}
+	}
+}
+
+func offHandler(res http.ResponseWriter, _ *http.Request) {
+	// Set the screen saver inactive (false)
+	if err := setScreenSaverActive(false); err != nil {
+		http.Error(res, "Error setting screen saver inactive", http.StatusInternalServerError)
+		log.Printf("Error setting screen saver inactive: %v", err)
+	} else {
+		res.Header().Set("content-type", "text/plain; charset=UTF-8")
+		res.WriteHeader(http.StatusOK)
+		fmt.Println("Screen saver activated successfully.")
+		_, err := res.Write([]byte("Screen saver activated successfully."))
+		if err != nil {
+			log.Printf("failed to write response: %v", err)
+			return
+		}
+	}
+}
+
+func main() {
+	mux := http.NewServeMux()
+	mux.HandleFunc(`/on`, onHandler)
+	mux.HandleFunc(`/off`, offHandler)
+
+	err := http.ListenAndServe(`:57650`, mux)
+	if err != nil {
+		panic(err)
 	}
 }
