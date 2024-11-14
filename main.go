@@ -55,8 +55,8 @@ func offHandler(res http.ResponseWriter, _ *http.Request) {
 	} else {
 		res.Header().Set("content-type", "text/plain; charset=UTF-8")
 		res.WriteHeader(http.StatusOK)
-		fmt.Println("Screen saver activated successfully.")
-		_, err := res.Write([]byte("Screen saver activated successfully."))
+		fmt.Println("Screen saver inactivated successfully.")
+		_, err := res.Write([]byte("Screen saver inactivated successfully."))
 		if err != nil {
 			log.Printf("failed to write response: %v", err)
 			return
@@ -69,8 +69,10 @@ func main() {
 	mux.HandleFunc(`/on`, onHandler)
 	mux.HandleFunc(`/off`, offHandler)
 
-	err := http.ListenAndServe(`:57650`, mux)
+	serverAddr := `:57650`
+	err := http.ListenAndServe(serverAddr, mux)
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("listening %v", serverAddr)
 }
