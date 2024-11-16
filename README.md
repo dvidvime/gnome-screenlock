@@ -22,7 +22,8 @@ http:// _your-ip_ :57650/_command_
 ## Running as a service with automatic restart
 Put this into `~/.config/systemd/user/screenlock.service`:
 
-```[Unit]  
+```
+[Unit]  
 Description=Screen control Service  
 After=graphical.target  
 
